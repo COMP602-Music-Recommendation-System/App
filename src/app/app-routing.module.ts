@@ -1,15 +1,25 @@
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 
+import { LoginRequired } from './login-required';
+
 const routes: Routes = [
   {
+    path: 'login',
+    loadComponent: () => import('./login/login.page').then((m) => m.LoginPage)
+  },
+  {
     path: '',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+    canActivate: [LoginRequired],
+    loadComponent: () => import('./main/main.page').then((m) => m.MainPage)
   }
 ];
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, {
+      preloadingStrategy: PreloadAllModules,
+      useHash: true
+    })
   ],
   exports: [RouterModule]
 })
