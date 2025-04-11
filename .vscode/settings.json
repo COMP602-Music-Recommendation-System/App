@@ -4,9 +4,16 @@
     "@ionic/angular/standalone"
   ],
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "files.autoSave": "onFocusChange",
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.maxTokenizationLineLength": 10000000000000000000,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
-  }
+  },
+  "workbench.startupEditor": "none",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "none",
 }
