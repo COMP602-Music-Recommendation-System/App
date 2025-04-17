@@ -5,7 +5,9 @@ import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import unusedImports from 'eslint-plugin-unused-imports';
 import perfectionist from 'eslint-plugin-perfectionist';
+import { includeIgnoreFile } from '@eslint/compat';
 import tsParser from '@typescript-eslint/parser';
+import { globalIgnores } from 'eslint/config';
 import { FlatCompat } from '@eslint/eslintrc';
 import globals from 'globals';
 import js from '@eslint/js';
@@ -19,6 +21,8 @@ const compat = new FlatCompat({
 });
 
 export default [
+  includeIgnoreFile(fileURLToPath(new URL('.gitignore', import.meta.url))),
+  globalIgnores(['android', 'ios']),
   ...fixupConfigRules(
     compat.extends(
       'plugin:@typescript-eslint/recommended',
