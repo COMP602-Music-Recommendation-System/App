@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  domain: 'http://localhost:8000/'
+  domain: 'https://apidebug.rtnztech.com'
 };
 
 /*
