@@ -23,7 +23,7 @@ if `brew` not found install with command:
 Install angular cli
 
 ```bash
-bun add -g @angular/cli
+bun add -g @angular/cli @ionic/cli
 ```
 
 </details>
