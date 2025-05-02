@@ -1,15 +1,78 @@
 <ion-content class="ion-padding">
   <div
     style="
-      justify-content: center;
-      align-items: center;
+      /* Consider using CSS classes */
       display: flex;
-      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
     "
   >
     <div>
-      <h1>You have login</h1>
+      <h1>You have logged in</h1>
       <ion-button expand="block" (click)="logout()"> Logout </ion-button>
+
+      <ion-button
+        expand="block"
+        (click)="importSpotifyData()"
+        [disabled]="isLoadingData"
+      >
+        <ion-spinner
+          *ngIf="isLoadingData"
+          name="crescent"
+          slot="start"
+        ></ion-spinner>
+        {{ isLoadingData ? 'Loading Tracks...' : 'Import Top Spotify Tracks' }}
+      </ion-button>
+
+      <ion-item *ngIf="errorLoadingData" color="danger">
+        <ion-label text-wrap>{{ errorLoadingData }}</ion-label>
+      </ion-item>
+
+      <ion-list *ngIf="!isLoadingData && topTracks.length > 0">
+        <ion-list-header> Your Top Tracks </ion-list-header>
+        <ion-item *ngFor="let track of topTracks">
+          <img
+            *ngIf="getSmallestAlbumImage(track.album) as imageUrl"
+            [src]="imageUrl"
+            alt="Album art"
+            slot="start"
+            style="width: 40px; height: 40px; margin-right: 10px"
+          />
+          <ion-avatar
+            slot="start"
+            *ngIf="!getSmallestAlbumImage(track.album)"
+            style="
+              width: 40px;
+              height: 40px;
+              margin-right: 10px;
+              background-color: var(--ion-color-step-200);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <ion-icon
+              name="musical-notes-outline"
+              style="font-size: 24px; color: var(--ion-color-step-600)"
+            ></ion-icon>
+          </ion-avatar>
+
+          <ion-label>
+            <h2>{{ track.name }}</h2>
+            <p>{{ getArtistNames(track.artists) }}</p>
+            <p *ngIf="track.album">{{ track.album.name }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-item
+        *ngIf="!isLoadingData && topTracks.length === 0 && !errorLoadingData"
+      >
+        <ion-label>
+          No top tracks to display. Click the button above to import.
+        </ion-label>
+      </ion-item>
     </div>
   </div>
 </ion-content>

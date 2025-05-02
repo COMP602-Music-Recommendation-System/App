@@ -1,9 +1,9 @@
+import { IonicModule, ToastController } from '@ionic/angular';
+import { Component, inject, OnInit } from '@angular/core';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { Component, OnInit } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 
 import { LoginService } from './login.service';
 
@@ -11,6 +11,7 @@ import { LoginService } from './login.service';
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -24,37 +25,53 @@ export class LoginPage implements OnInit {
   showMethod: string[] = [];
   allMethod: string[] = [];
 
-  constructor(private loginService: LoginService) {}
+  private loginService = inject(LoginService);
+  private toastController = inject(ToastController);
 
-  async ngOnInit() {
-    const verify = await this.loginService.verify();
-    if (verify) {
-      let next = localStorage.getItem('next');
-      if (next) {
-        localStorage.removeItem('next');
-      } else next = '/';
-      location.href = next;
+  async ngOnInit(): Promise<void> {
+    const loggedIn = await this.loginService.verify();
+    if (loggedIn) {
+      const next = localStorage.getItem('next') || '/';
+      localStorage.removeItem('next');
+      window.location.replace(next);
+      return;
     }
 
-    this.loginService.loadMethod().subscribe((allMethod) => {
-      for (let i = 0; i < 3; i++) {
-        const method = allMethod.shift();
-        if (method) this.showMethod.push(method);
+    this.loginService.loadMethod().subscribe({
+      next: (methods) => {
+        this.showMethod = methods.slice(0, 3);
+        this.allMethod = methods.slice(3);
+        this.loaded = this.allMethod.length === 0;
+      },
+      error: (err) => {
+        console.error('Load methods failed', err);
+        this.presentToast('Could not load login options.');
       }
-      this.allMethod = allMethod;
     });
   }
 
-  load() {
-    while (true) {
-      const method = this.allMethod.shift();
-      if (method) this.showMethod.push(method);
-      else break;
-    }
+  load(): void {
+    this.showMethod.push(...this.allMethod);
+    this.allMethod = [];
     this.loaded = true;
   }
 
-  async login(method: string) {
-    location.href = await this.loginService.login(method);
+  async login(method: string): Promise<void> {
+    try {
+      const url = await this.loginService.login(method);
+      window.location.href = url;
+    } catch (error) {
+      console.error('Login error', error);
+      this.presentToast(`Login with ${method} failed.`);
+    }
+  }
+
+  private async presentToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'bottom'
+    });
+    await toast.present();
   }
 }
