@@ -64,5 +64,9 @@
     "Edge >=79",
     "Safari >=13",
     "iOS >=13"
+  ],
+  "trustedDependencies": [
+    "@parcel/watcher",
+    "unrs-resolver"
   ]
 }
