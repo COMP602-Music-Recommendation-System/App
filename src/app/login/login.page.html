@@ -9,14 +9,6 @@
   >
     <div>
       <h1>Login</h1>
-      <ion-item>
-        <ion-input
-          label="Email input"
-          type="email"
-          placeholder="email@domain.com"
-        ></ion-input>
-      </ion-item>
-      <nz-divider style="width: 100%" nzText="Or"></nz-divider>
       @for (method of showMethod; track $index) {
       <ion-button expand="block" (click)="login(method)">
         <nz-icon
