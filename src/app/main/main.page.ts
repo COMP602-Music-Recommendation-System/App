@@ -6,8 +6,12 @@ import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import {
+  SpotifyService,
+  RecommendationItem,
+  RecommendationsResponse
+} from '../spotify.service';
 import { LoginService } from '../login/login.service';
-import { SpotifyService } from '../spotify.service';
 
 interface SpotifyArtist {
   name: string;
@@ -34,6 +38,11 @@ export class MainPage implements OnInit {
   topTracks: SpotifyTrack[] = [];
   isLoadingData = false;
   errorLoadingData: string | null = null;
+
+  recommendations: RecommendationItem[] = [];
+  isLoadingRecommendations = false;
+  errorLoadingRecommendations: string | null = null;
+  recommendationsMessage: string | null = null;
 
   constructor(
     private loginService: LoginService,
@@ -75,7 +84,40 @@ export class MainPage implements OnInit {
         }
       });
   }
+  fetchRecommendations(): void {
+    if (this.isLoadingRecommendations) {
+      return;
+    }
+    this.isLoadingRecommendations = true;
+    this.errorLoadingRecommendations = null;
+    this.recommendations = [];
+    this.recommendationsMessage = null;
 
+    this.spotifyService
+      .getRecommendations()
+      .pipe(finalize(() => (this.isLoadingRecommendations = false)))
+      .subscribe({
+        next: (response: RecommendationsResponse) => {
+          this.recommendations = response.items ?? [];
+          if (response.message) {
+            this.recommendationsMessage = response.message;
+          }
+          // If no items and no specific message, provide a generic one.
+          if (this.recommendations.length === 0 && !response.message) {
+            this.recommendationsMessage =
+              'No recommendations were generated at this time.';
+          }
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Error fetching recommendations', err);
+          this.errorLoadingRecommendations =
+            err.error?.detail ||
+            err.message ||
+            'Failed to load recommendations.';
+          this.recommendations = [];
+        }
+      });
+  }
   getArtistNames(artists?: SpotifyArtist[]): string {
     return artists && artists.length
       ? artists.map((a) => a.name).join(', ')

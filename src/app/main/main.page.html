@@ -8,7 +8,7 @@
       padding-top: 20px;
     "
   >
-    <div>
+    <div style="width: 60vw; max-width: 900px">
       <h1>You have logged in</h1>
       <ion-button expand="block" (click)="logout()"> Logout </ion-button>
 
@@ -29,50 +29,166 @@
         <ion-label text-wrap>{{ errorLoadingData }}</ion-label>
       </ion-item>
 
-      <ion-list *ngIf="!isLoadingData && topTracks.length > 0">
-        <ion-list-header> Your Top Tracks </ion-list-header>
-        <ion-item *ngFor="let track of topTracks">
-          <img
-            *ngIf="getSmallestAlbumImage(track.album) as imageUrl"
-            [src]="imageUrl"
-            alt="Album art"
-            slot="start"
-            style="width: 40px; height: 40px; margin-right: 10px"
-          />
-          <ion-avatar
-            slot="start"
-            *ngIf="!getSmallestAlbumImage(track.album)"
+      <div class="lists-container">
+        <div class="list-column" id="top-tracks-column">
+          <ion-list *ngIf="!isLoadingData && topTracks.length > 0">
+            <ion-list-header> Your Top Tracks </ion-list-header>
+            <ion-item *ngFor="let track of topTracks">
+              <img
+                *ngIf="getSmallestAlbumImage(track.album) as imageUrl"
+                [src]="imageUrl"
+                alt="Album art"
+                slot="start"
+                style="width: 40px; height: 40px; margin-right: 10px"
+              />
+              <ion-avatar
+                slot="start"
+                *ngIf="!getSmallestAlbumImage(track.album)"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  margin-right: 10px;
+                  background-color: var(--ion-color-step-200);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <ion-icon
+                  name="musical-notes-outline"
+                  style="font-size: 24px; color: var(--ion-color-step-600)"
+                ></ion-icon>
+              </ion-avatar>
+
+              <ion-label>
+                <h2>{{ track.name }}</h2>
+                <p>{{ getArtistNames(track.artists) }}</p>
+                <p *ngIf="track.album">{{ track.album.name }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+
+          <ion-item
+            *ngIf="!isLoadingData && topTracks.length === 0 && !errorLoadingData"
+          >
+            <ion-label>
+              No top tracks to display. Click the button above to import.
+            </ion-label>
+          </ion-item>
+
+          <hr
             style="
-              width: 40px;
-              height: 40px;
-              margin-right: 10px;
-              background-color: var(--ion-color-step-200);
-              display: flex;
-              align-items: center;
-              justify-content: center;
+              margin: 20px 0;
+              border: 0;
+              border-top: 1px solid var(--ion-color-step-250);
+            "
+          />
+        </div>
+        <div class="lists-column" id="recommendations-column">
+          <ion-button
+            expand="block"
+            (click)="fetchRecommendations()"
+            [disabled]="isLoadingRecommendations || topTracks.length === 0 && !isLoadingData"
+            color="secondary"
+          >
+            <ion-spinner
+              *ngIf="isLoadingRecommendations"
+              name="crescent"
+              slot="start"
+            ></ion-spinner>
+            {{ isLoadingRecommendations ? 'Getting Recommendations...' : 'Get
+            Music Recommendations' }}
+          </ion-button>
+          <p
+            *ngIf="topTracks.length === 0 && !isLoadingData"
+            style="
+              text-align: center;
+              font-size: 0.9em;
+              color: var(--ion-color-medium);
             "
           >
-            <ion-icon
-              name="musical-notes-outline"
-              style="font-size: 24px; color: var(--ion-color-step-600)"
-            ></ion-icon>
-          </ion-avatar>
+            Import your top tracks first to get recommendations.
+          </p>
 
-          <ion-label>
-            <h2>{{ track.name }}</h2>
-            <p>{{ getArtistNames(track.artists) }}</p>
-            <p *ngIf="track.album">{{ track.album.name }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+          <ion-item
+            *ngIf="errorLoadingRecommendations"
+            color="danger"
+            lines="none"
+          >
+            <ion-label text-wrap>{{ errorLoadingRecommendations }}</ion-label>
+          </ion-item>
 
-      <ion-item
-        *ngIf="!isLoadingData && topTracks.length === 0 && !errorLoadingData"
-      >
-        <ion-label>
-          No top tracks to display. Click the button above to import.
-        </ion-label>
-      </ion-item>
+          <ion-item
+            *ngIf="!isLoadingRecommendations && recommendationsMessage && recommendations.length === 0"
+            lines="none"
+          >
+            <ion-label text-wrap>{{ recommendationsMessage }}</ion-label>
+          </ion-item>
+
+          <ion-list
+            *ngIf="!isLoadingRecommendations && recommendations.length > 0"
+          >
+            <ion-list-header>
+              <ion-label color="secondary"
+                >Your Music Recommendations</ion-label
+              >
+            </ion-list-header>
+            <ion-item *ngFor="let rec of recommendations" lines="inset">
+              <ion-avatar
+                slot="start"
+                style="
+                  width: 40px;
+                  height: 40px;
+                  margin-right: 10px;
+                  background-color: var(--ion-color-secondary-tint);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border-radius: 4px;
+                "
+              >
+                <ion-icon
+                  name="sparkles-outline"
+                  style="
+                    font-size: 22px;
+                    color: var(--ion-color-secondary-contrast);
+                  "
+                ></ion-icon>
+              </ion-avatar>
+              <ion-label>
+                <h2>{{ rec.track }}</h2>
+                <p>
+                  <strong style="color: var(--ion-text-color)">Artist:</strong>
+                  {{ rec.artist }}
+                </p>
+                <p *ngIf="rec.album && rec.album !== 'Unknown Album'">
+                  <strong style="color: var(--ion-text-color)">Album:</strong>
+                  {{ rec.album }}
+                </p>
+                <p
+                  style="
+                    font-size: 0.85em;
+                    color: var(--ion-color-medium);
+                    margin-top: 4px;
+                  "
+                >
+                  <em>Reason: {{ rec.reason }}</em>
+                </p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+
+          <ion-item
+            *ngIf="!isLoadingRecommendations && recommendations.length === 0 && !errorLoadingRecommendations && !recommendationsMessage && topTracks.length > 0"
+            lines="none"
+          >
+            <ion-label style="text-align: center; font-size: 0.9em">
+              Click the button above to generate recommendations based on your
+              top tracks.
+            </ion-label>
+          </ion-item>
+        </div>
+      </div>
     </div>
   </div>
 </ion-content>
