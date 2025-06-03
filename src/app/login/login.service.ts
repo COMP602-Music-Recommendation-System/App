@@ -1,12 +1,9 @@
-import { catchError, firstValueFrom, map, Observable, of } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
-import { environment } from '../../environments/environment';
+import { environment } from 'src/environments/environment';
 
-interface AuthUrlResponse {
-  authorization_url: string;
-}
 interface StatusResponse {
   msg: string;
 }
@@ -23,37 +20,19 @@ export class LoginService {
 
   async login(method: string): Promise<string> {
     const url = await firstValueFrom(
-      this.http.get<AuthUrlResponse>(`${this.root}/${method}/login`).pipe(
-        map((res) => res.authorization_url),
-        catchError((error: HttpErrorResponse) => {
-          console.error('Login failed', error);
-          throw new Error(`Login URL error (${error.status})`);
-        })
-      )
+      this.http.get<string>(`${this.root}/${method}/login`)
     );
-    if (!url) {
-      throw new Error('No authorization URL');
-    }
     return url;
   }
 
   async verify(): Promise<boolean> {
     const result = await firstValueFrom(
-      this.http
-        .get<StatusResponse>(`${this.root}/verify`, { withCredentials: true })
-        .pipe(
-          catchError((error: HttpErrorResponse) => {
-            console.log('Verify error', error.status);
-            return of({ msg: 'Error' });
-          })
-        )
+      this.http.get<StatusResponse>(`${this.root}/verify`)
     );
     return result.msg === 'Success';
   }
 
   logout(): Observable<StatusResponse> {
-    return this.http.get<StatusResponse>(`${this.root}/logout`, {
-      withCredentials: true
-    });
+    return this.http.get<StatusResponse>(`${this.root}/logout`);
   }
 }

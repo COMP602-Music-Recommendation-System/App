@@ -4,12 +4,12 @@
   "newProjectRoot": "projects",
   "schematics": {
     "@ionic/angular-toolkit:component": {
-      "skipTests": true,
-      "styleext": "scss"
+      "styleext": "scss",
+      "spec": false
     },
     "@ionic/angular-toolkit:page": {
-      "skipTests": true,
-      "styleext": "scss"
+      "styleext": "scss",
+      "spec": false
     },
     "@schematics/angular:class": {
       "skipTests": true
@@ -62,11 +62,6 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
-              },
-              {
-                "glob": "**/*",
-                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
-                "output": "/assets/"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],

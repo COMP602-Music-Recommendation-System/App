@@ -47,10 +47,17 @@ export default [
 
     rules: {
       '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       'unused-imports/no-unused-imports': 'error',
       'no-unused-vars': 'off',
+
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ],
 
       'perfectionist/sort-imports': [
         'error',
@@ -63,14 +70,14 @@ export default [
             'builtin',
             'external',
             'internal',
-            'share',
+            'src',
             ['sibling', 'parent'],
             'index',
             'unknown'
           ],
           customGroups: {
             value: {
-              share: ['^share']
+              src: ['^src']
             }
           }
         }
