@@ -1,13 +1,8 @@
 import {
-  IonContent,
-  IonHeader,
   IonIcon,
-  IonTab,
   IonTabBar,
   IonTabButton,
-  IonTabs,
-  IonTitle,
-  IonToolbar
+  IonTabs
 } from '@ionic/angular/standalone';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
