@@ -134,4 +134,24 @@ export class MainPage implements OnInit {
       .sort((a, b) => (a.height ?? Infinity) - (b.height ?? Infinity));
     return sorted[0]?.url ?? null;
   }
+  searchQuery: string = '';
+  results: any[] = [];
+
+  onSearch() {
+    if (!this.searchQuery.trim()) {
+      this.results = [];
+      return;
+    }
+
+    this.spotifyService.searchSpotify(this.searchQuery, 'track').subscribe({
+      next: (data) => {
+        console.log('Search result:', data);
+        this.results = data.tracks.items;
+      },
+      error: (err) => {
+        console.error('Error during Spotify search:', err);
+        this.results = [];
+      }
+    });
+  }
 }
