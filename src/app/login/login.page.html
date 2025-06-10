@@ -1,0 +1,30 @@
+<ion-content class="ion-padding">
+  <div
+    style="
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      height: 100%;
+    "
+  >
+    <div>
+      <h1>Login</h1>
+      @for (method of showMethod; track $index) {
+      <ion-button expand="block" (click)="login(method) " style="width: 130%">
+        <nz-icon
+          style="position: absolute; left: 0"
+          [nzType]="method"
+          nzTheme="outline"
+        />
+        {{method}}
+      </ion-button>
+      } @if (!loaded) {
+      <nz-divider
+        style="width: 100%"
+        nzText="Load more"
+        (click)="load()"
+      ></nz-divider>
+      }
+    </div>
+  </div>
+</ion-content>
